@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practice Section VIII - Ms Lê Hằng English</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================
+       1. GIAO DIỆN NỀN LOANG & HỌA TIẾT SVG GAMIFICATION
+       ========================================== */
+    :root {
+      --primary-purple: #8854C0;
+      --accent-yellow: #FDCB6E;
+      --accent-teal: #00C9A7;
+      --correct-green: #00D26A;
+      --wrong-red: #FF4757;
+      --card-bg: rgba(255, 255, 255, 0.96);
+      --text-dark: #2D3436;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Quicksand', 'Nunito', sans-serif;
+      min-height: 100vh;
+      color: var(--text-dark);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px 10px;
+      position: relative;
+      overflow-x: hidden;
+      
+      background: linear-gradient(-45deg, #8854C0, #FDCB6E, #00C9A7, #FF7675, #6C5CE7);
+      background-size: 400% 400%;
+      animation: gradientSmooth 15s ease infinite;
+    }
+
+    @keyframes gradientSmooth {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.28;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 100 100"><path fill="%23FFF" d="M25,10 L29,20 L40,20 L31,27 L34,38 L25,31 L16,38 L19,27 L10,20 L21,20 Z"/><circle cx="75" cy="25" r="7" fill="%23FFF"/><path fill="%23FFF" d="M70,75 C70,70 80,70 80,75 C85,75 85,85 80,85 C80,90 70,90 70,85 C65,85 65,75 70,75 Z"/><path fill="%23FFF" d="M20,70 Q25,60 30,70 T40,70 T30,80 T20,70 Z"/><path fill="%23FFF" d="M80,15 C82,10 88,10 90,15 C95,17 95,23 90,25 C88,30 82,30 80,25 C75,23 75,17 80,15 Z"/></svg>');
+      background-size: 140px 140px;
+      animation: floatPattern 22s linear infinite;
+    }
+
+    @keyframes floatPattern {
+      from { background-position: 0 0; }
+      to { background-position: 500px 1000px; }
+    }
+
+    /* ==========================================
+       2. BỐ CỤC CHÍNH (CONTAINER)
+       ========================================== */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 820px;
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 25px 30px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.22), 0 0 0 8px rgba(255,255,255,0.45);
+      backdrop-filter: blur(12px);
+    }
+
+    .teacher-header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .teacher-header h5 {
+      font-size: 0.95rem;
+      color: var(--primary-purple);
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      background: #E8D8F8;
+      display: inline-block;
+      padding: 5px 18px;
+      border-radius: 20px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+    }
+
+    .alert-banner {
+      background: #FFF9DB;
+      border: 3px dashed #FCC419;
+      border-radius: 18px;
+      padding: 14px 20px;
+      margin-bottom: 25px;
+      text-align: center;
+      color: #D9480F;
+      font-weight: 700;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .alert-banner .title {
+      font-size: 1.05rem;
+      font-weight: 900;
+      display: block;
+      margin-bottom: 4px;
+      color: #E65100;
+    }
+
+    .alert-banner .highlight {
+      color: #D32F2F;
+      text-decoration: underline;
+      font-style: italic;
+    }
+
+    .progress-box {
+      margin-bottom: 25px;
+      background: #E9ECEF;
+      border-radius: 14px;
+      height: 20px;
+      overflow: hidden;
+      position: relative;
+      border: 2px solid #CED4DA;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00C9A7, #00D26A);
+      transition: width 0.4s ease;
+    }
+
+    /* ==========================================
+       3. THẺ CÂU HỎI & NÚT LỰA CHỌN 3D
+       ========================================== */
+    .section-heading {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--primary-purple);
+      margin: 25px 0 15px 0;
+      padding: 12px 18px;
+      background: #F1F3F5;
+      border-radius: 16px;
+      border-left: 6px solid var(--primary-purple);
+      line-height: 1.5;
+    }
+
+    .question-card {
+      background: #FFFFFF;
+      border-radius: 22px;
+      padding: 22px;
+      margin-bottom: 22px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+      border: 2px solid #E9ECEF;
+      transition: transform 0.2s ease;
+    }
+
+    .question-title {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #2D3436;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background: #F8F9FA;
+      border: 2px solid #E9ECEF;
+      border-bottom: 5px solid #CED4DA;
+      border-radius: 18px;
+      padding: 14px 20px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #495057;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: inherit;
+    }
+
+    .option-btn:hover:not(.disabled) {
+      transform: scale(1.01) translateY(-2px);
+      border-color: #B2BEC3;
+      background: #FFFFFF;
+    }
+
+    .option-btn:active:not(.disabled) {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    .option-btn.correct {
+      background-color: #D4EDDA !important;
+      border-color: var(--correct-green) !important;
+      border-bottom-color: #27AE60 !important;
+      color: #155724 !important;
+    }
+
+    .option-btn.wrong {
+      background-color: #F8D7DA !important;
+      border-color: var(--wrong-red) !important;
+      border-bottom-color: #C0392B !important;
+      color: #721C24 !important;
+      animation: shake 0.4s ease;
+    }
+
+    .option-btn.disabled {
+      cursor: default;
+      opacity: 0.9;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    /* ==========================================
+       4. KHUNG GIẢI THÍCH CHI TIẾT 4 BƯỚC
+       ========================================== */
+    .explanation-box {
+      display: none;
+      margin-top: 18px;
+      background: #F8F9FA;
+      border: 2px dashed var(--primary-purple);
+      border-left: 6px solid var(--primary-purple);
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-size: 0.93rem;
+      line-height: 1.65;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .explanation-box .exp-title {
+      font-weight: 800;
+      color: var(--primary-purple);
+      font-size: 1rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .explanation-box .step {
+      margin-bottom: 8px;
+    }
+
+    .explanation-box ul {
+      margin-left: 22px;
+      margin-bottom: 8px;
+    }
+
+    .explanation-box ul li {
+      margin-bottom: 3px;
+    }
+
+    .explanation-box .highlight-green {
+      color: #27AE60;
+      font-weight: 700;
+    }
+
+    /* ==========================================
+       5. NÚT NỘP BÀI VÀ POPUP KẾT QUẢ
+       ========================================== */
+    .submit-container {
+      text-align: center;
+      margin-top: 35px;
+      margin-bottom: 15px;
+    }
+
+    .submit-btn {
+      background: linear-gradient(180deg, #00C9A7 0%, #00B894 100%);
+      color: white;
+      border: none;
+      border-bottom: 6px solid #008F68;
+      border-radius: 22px;
+      padding: 16px 50px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(0,201,167,0.35);
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(0,201,167,0.45);
+    }
+
+    .submit-btn:active {
+      transform: translateY(3px);
+      border-bottom-width: 2px;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 26px;
+      padding: 32px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-score {
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: var(--primary-purple);
+      margin: 15px 0;
+    }
+
+    .modal-feedback {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #2D3436;
+      margin-bottom: 25px;
+      background: #F8F9FA;
+      padding: 16px;
+      border-radius: 18px;
+      border: 2px dashed #B2BEC3;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="container">
+    <div class="teacher-header">
+      <h5>Giáo viên tạo: Ms Lê Hằng English</h5>
+    </div>
+
+    <div class="alert-banner">
+      <span class="title">⚠️ LỜI NHẮC CỰC KỲ QUAN TRỌNG ⚠️</span>
+      Chỉ có đọc kỹ giải thích ngay sau mỗi câu, sau đó ghi lại từ vựng/cấu trúc mới vào vở để học thì mới thực sự giỏi lên.<br>
+      Làm cho xong mà không đọc giải thích hay đọc qua loa không ghi chép thì chỉ tốn thời gian vô ích!<br>
+      <span class="highlight">* Kéo tới đâu, làm tới đó! *</span>
+    </div>
+
+    <div class="progress-box">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="quiz-container"></div>
+
+    <div class="submit-container">
+      <button class="submit-btn" onclick="submitQuiz()">NỘP BÀI KIỂM TRA 🚀</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="result-modal">
+    <div class="modal-content">
+      <h2 style="color: var(--primary-purple);">🎉 KẾT QUẢ BÀI THI 🎉</h2>
+      <div class="modal-score" id="modal-score-text">0 / 0</div>
+      <div class="modal-feedback" id="modal-feedback-text"></div>
+      <button class="close-btn" onclick="closeModal()">Xem lại đáp án chi tiết</button>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================
+       1. CƠ SỞ DỮ LIỆU ĐỀ BÀI (SECTION VIII: 1-6)
+       ========================================== */
+    const quizData = [
+      {
+        id: "viii_1",
+        section: "VIII. Rewrite the following sentences based on the given words.",
+        question: "1. It was very difficult to travel to the town 5 years ago. Now people can drive a car or take a bus there. (easily)<br>➔ People can travel _______.",
+        options: [
+          { letter: "A", text: "to the town more easily now than 5 years ago." },
+          { letter: "B", text: "to the town easily than 5 years ago." },
+          { letter: "C", text: "to the town more easy now than 5 years ago." },
+          { letter: "D", text: "to the town easily now than 5 years ago." }
+        ],
+        correct: "A",
+        explanation: {
+          step1: "Dịch câu gốc: '5 năm trước đi lại đến thị trấn rất khó khăn. Bây giờ mọi người có thể lái ô tô hoặc đi xe buýt đến đó.' ➔ Viết lại dùng dạng so sánh hơn của trạng từ 'easily': 'Mọi người có thể đi lại đến thị trấn dễ dàng hơn bây giờ so với 5 năm trước.'",
+          step2: [
+            "A. to the town more easily now than 5 years ago. (Đúng cấu trúc so sánh hơn trạng từ 'more easily than').",
+            "B. ...easily than... (Thiếu 'more' trong so sánh hơn trạng từ dài).",
+            "C. ...more easy... (Dùng sai tính từ 'easy' bổ nghĩa cho động từ 'travel', phải dùng trạng từ 'easily').",
+            "D. ...easily now than... (Thiếu 'more' trong so sánh hơn)."
+          ],
+          step3: "Tại sao chọn A? Bổ nghĩa cho động từ thường 'travel' ta dùng trạng từ 'easily'. Dạng so sánh hơn của trạng từ có đuôi -ly: 'MORE + Adv + THAN' (more easily now than 5 years ago).",
+          step4: "Loại B, D thiếu 'more'; loại C dùng sai tính từ 'easy'."
+        }
+      },
+      {
+        id: "viii_2",
+        section: "VIII. Rewrite the following sentences based on the given words.",
+        question: "2. You won't pass the exam unless you study harder. (if)<br>➔ _______.",
+        options: [
+          { letter: "A", text: "If you don't study harder, you won't pass the exam." },
+          { letter: "B", text: "If you study harder, you won't pass the exam." },
+          { letter: "C", text: "If you didn't study harder, you won't pass the exam." },
+          { letter: "D", text: "If you don't study harder, you will pass the exam." }
+        ],
+        correct: "A",
+        explanation: {
+          step1: "Dịch câu gốc: 'Bạn sẽ không đỗ kỳ thi trừ khi bạn học chăm chỉ hơn.' ➔ Viết lại dùng 'If': 'Nếu bạn không học chăm chỉ hơn, bạn sẽ không đỗ kỳ thi.'",
+          step2: [
+            "A. If you don't study harder, you won't pass the exam. (Đúng ngữ pháp quy đổi Unless = If... not).",
+            "B. If you study harder... (Nếu bạn học chăm chỉ hơn bạn sẽ không đỗ ➔ Trái ngược nghĩa gốc).",
+            "C. ...didn't study... (Chia sai thì Quá khứ đơn 'didn't' trong câu điều kiện loại 1).",
+            "D. ...you will pass... (Ngược nghĩa ở vế kết quả)."
+          ],
+          step3: "Tại sao chọn A? Cấu trúc quy đổi từ 'Unless' sang 'If': 'Unless + S + V' = 'If + S + don't/doesn't + V'. Vì vậy 'Unless you study' đổi thành 'If you don't study'.",
+          step4: "Loại B, D ngược nghĩa; loại C sai chia thì."
+        }
+      },
+      {
+        id: "viii_3",
+        section: "VIII. Rewrite the following sentences based on the given words.",
+        question: "3. Preserve our traditional culture or we will lose our national identity.<br>➔ If _______.",
+        options: [
+          { letter: "A", text: "we don't preserve our traditional culture, we will lose our national identity." },
+          { letter: "B", text: "we preserve our traditional culture, we will lose our national identity." },
+          { letter: "C", text: "we didn't preserve our traditional culture, we will lose our national identity." },
+          { letter: "D", text: "we don't preserve our traditional culture, we won't lose our national identity." }
+        ],
+        correct: "A",
+        explanation: {
+          step1: "Dịch câu gốc: 'Hãy gìn giữ văn hóa truyền thống của chúng ta hoặc chúng ta sẽ mất đi bản sắc dân tộc.' ➔ Viết lại dùng câu điều kiện 'If': 'Nếu chúng ta không gìn giữ văn hóa truyền thống, chúng ta sẽ mất đi bản sắc dân tộc.'",
+          step2: [
+            "A. we don't preserve our traditional culture, we will lose our national identity. (Đúng hoàn toàn).",
+            "B. If we preserve... (Nếu gìn giữ thì sẽ mất bản sắc ➔ Trái ngược nghĩa gốc).",
+            "C. ...didn't preserve... (Sai thì Quá khứ trong câu điều kiện loại 1).",
+            "D. ...we won't lose... (Ngược nghĩa vế kết quả)."
+          ],
+          step3: "Tại sao chọn A? Cấu trúc quy đổi từ câu mệnh lệnh + OR sang câu điều kiện loại 1: 'V-bare + or + S + will + V' = 'If + S + don't/doesn't + V, S + will + V'.",
+          step4: "Loại B, D ngược nghĩa; loại C chia sai thì."
+        }
+      },
+      {
+        id: "viii_4",
+        section: "VIII. Rewrite the following sentences based on the given words.",
+        question: "4. Although it was raining heavily, they went for a walk in the park.<br>➔ Despite _______.",
+        options: [
+          { letter: "A", text: "the heavy rain, they went for a walk in the park." },
+          { letter: "B", text: "it was raining heavily, they went for a walk in the park." },
+          { letter: "C", text: "of the heavy rain, they went for a walk in the park." },
+          { letter: "D", text: "the heavy rain, but they went for a walk in the park." }
+        ],
+        correct: "A",
+        explanation: {
+          step1: "Dịch câu gốc: 'Mặc dù trời mưa to, họ vẫn đi dạo trong công viên.' ➔ Viết lại dùng 'Despite': 'Mặc dù trận mưa to, họ vẫn đi dạo trong công viên.'",
+          step2: [
+            "A. the heavy rain, they went for a walk in the park. (Đúng quy tắc Despite + N/N-phrase).",
+            "B. ...it was raining... (Sau Despite không đi với mệnh đề S + V).",
+            "C. ...of the heavy rain... (Thừa giới từ 'of', 'In spite of' mới có 'of', 'Despite' không có 'of').",
+            "D. ...but they... (Thừa liên từ 'but')."
+          ],
+          step3: "Tại sao chọn A? Cấu trúc quy đổi từ 'Although' sang 'Despite': 'Although + S + V + Adv' = 'Despite + the + Adj + N' ('it was raining heavily' ➔ 'the heavy rain').",
+          step4: "Loại B đi với mệnh đề; loại C thừa 'of'; loại D thừa 'but'."
+        }
+      },
+      {
+        id: "viii_5",
+        section: "VIII. Rewrite the following sentences based on the given words.",
+        question: "5. In spite of his lack of experience, he managed to finish the project on time.<br>➔ Even though _______.",
+        options: [
+          { letter: "A", text: "he lacked experience, he managed to finish the project on time." },
+          { letter: "B", text: "his lack of experience, he managed to finish the project on time." },
+          { letter: "C", text: "he lacked experience, but he managed to finish the project on time." },
+          { letter: "D", text: "he lacks experience, he managed to finish the project on time." }
+        ],
+        correct: "A",
+        explanation: {
+          step1: "Dịch câu gốc: 'Mặc dù thiếu kinh nghiệm, anh ấy vẫn hoàn thành dự án đúng hạn.' ➔ Viết lại dùng 'Even though': 'Mặc dù anh ấy thiếu kinh nghiệm, anh ấy vẫn hoàn thành dự án đúng hạn.'",
+          step2: [
+            "A. he lacked experience, he managed to finish the project on time. (Đúng ngữ pháp Even though + Mệnh đề S + V trong quá khứ).",
+            "B. ...his lack of experience... (Sau 'Even though' phải là mệnh đề S + V, không dùng cụm danh từ).",
+            "C. ...but he... (Thừa liên từ 'but').",
+            "D. ...lacks... (Chia sai thì Hiện tại đơn 'lacks' trong khi câu gốc ở Quá khứ đơn 'managed')."
+          ],
+          step3: "Tại sao chọn A? Cấu trúc quy đổi từ 'In spite of + N' sang 'Even though + Clause': 'In spite of his lack of experience' = 'Even though he lacked experience'. Động từ chia quá khứ 'lacked' đồng bộ với 'managed'.",
+          step4: "Loại B dùng cụm danh từ; loại C thừa 'but'; loại D sai chia thì."
+        }
+      },
+      {
+        id: "viii_6",
+        section: "VIII. Rewrite the following sentences based on the given words.",
+        question: "6. Last year, I didn't know how to speak English. Now I can speak confidently. (fluently)<br>➔ _______.",
+        options: [
+          { letter: "A", text: "Now I can speak English more fluently than last year." },
+          { letter: "B", text: "Now I can speak English more fluent than last year." },
+          { letter: "C", text: "Now I can speak English as fluently than last year." },
+          { letter: "D", text: "Now I can speak English fluently than last year." }
+        ],
+        correct: "A",
+        explanation: {
+          step1: "Dịch câu gốc: 'Năm ngoái tôi không biết nói tiếng Anh. Bây giờ tôi có thể nói một cách tự tin.' ➔ Viết lại dùng 'fluently': 'Bây giờ tôi có thể nói tiếng Anh trôi chảy hơn so với năm ngoái.'",
+          step2: [
+            "A. Now I can speak English more fluently than last year. (Đúng ngữ pháp so sánh hơn trạng từ dài 'more fluently than').",
+            "B. ...more fluent... (Dùng sai tính từ 'fluent' bổ nghĩa cho động từ 'speak').",
+            "C. ...as fluently than... (Mắc lỗi kết hợp sai cặp 'as... than').",
+            "D. ...fluently than... (Thiếu 'more' trong so sánh hơn trạng từ dài)."
+          ],
+          step3: "Tại sao chọn A? Động từ 'speak' đi với trạng từ 'fluently'. So sánh hơn của trạng từ có đuôi -ly: 'MORE fluently THAN last year'.",
+          step4: "Loại B sai tính/trạng từ; loại C sai từ so sánh; loại D thiếu 'more'."
+        }
+      }
+    ];
+
+    /* ==========================================
+       2. TẠO ÂM THANH BẰNG WEB AUDIO API
+       ========================================== */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+      }
+    }
+
+    /* ==========================================
+       3. HIỆU ỨNG PHÁO GIẤY (CONFETTI)
+       ========================================== */
+    function triggerConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const pieces = [];
+      const colors = ['#8854C0', '#FDCB6E', '#00C9A7', '#FF7675', '#00D26A', '#6C5CE7'];
+
+      for (let i = 0; i < 90; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 9 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speed: Math.random() * 4 + 2,
+          rotation: Math.random() * 360
+        });
+      }
+
+      let animationFrame;
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.y += p.speed;
+          p.rotation += 2;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        });
+
+        if (pieces.some(p => p.y < canvas.height)) {
+          animationFrame = requestAnimationFrame(render);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          cancelAnimationFrame(animationFrame);
+        }
+      }
+      render();
+    }
+
+    /* ==========================================
+       4. LOGIC HIỂN THỊ CÂU HỎI (GIỮ NGUYÊN THỨ TỰ)
+       ========================================== */
+    let userAnswers = {};
+
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
+
+    function renderQuiz() {
+      const quizContainer = document.getElementById('quiz-container');
+      quizContainer.innerHTML = '';
+
+      const sections = {};
+      quizData.forEach(item => {
+        if (!sections[item.section]) {
+          sections[item.section] = [];
+        }
+        sections[item.section].push(item);
+      });
+
+      for (const secTitle in sections) {
+        const secHeader = document.createElement('div');
+        secHeader.className = 'section-heading';
+        secHeader.innerHTML = `📌 ${secTitle}`;
+        quizContainer.appendChild(secHeader);
+
+        sections[secTitle].forEach(q => {
+          const card = document.createElement('div');
+          card.className = 'question-card';
+          card.id = `q-card-${q.id}`;
+
+          const shuffledOptions = shuffle([...q.options]);
+
+          let optionsHTML = '<div class="options-grid">';
+          shuffledOptions.forEach(opt => {
+            optionsHTML += `
+              <button class="option-btn" 
+                      id="btn-${q.id}-${opt.letter}" 
+                      onclick="selectAnswer('${q.id}', '${opt.letter}', '${q.correct}')">
+                <strong>${opt.letter}.</strong> ${opt.text}
+              </button>
+            `;
+          });
+          optionsHTML += '</div>';
+
+          let expStepsHTML = '';
+          if (q.explanation.step2 && Array.isArray(q.explanation.step2)) {
+            expStepsHTML = '<ul>' + q.explanation.step2.map(item => `<li>${item}</li>`).join('') + '</ul>';
+          }
+
+          const explanationHTML = `
+            <div class="explanation-box" id="exp-${q.id}">
+              <div class="exp-title">💡 PHẦN GIẢI THÍCH CHI TIẾT TỪ MS LÊ HẰNG:</div>
+              <div class="step"><strong>1. Phân tích & Dịch nghĩa câu hỏi:</strong> ${q.explanation.step1}</div>
+              ${expStepsHTML}
+              <div class="step"><strong class="highlight-green">2. Tại sao chọn đáp án đúng?</strong> ${q.explanation.step3}</div>
+              <div class="step"><strong>3. Phân tích lỗi sai các đáp án còn lại:</strong> ${q.explanation.step4}</div>
+            </div>
+          `;
+
+          card.innerHTML = `
+            <div class="question-title">${q.question}</div>
+            ${optionsHTML}
+            ${explanationHTML}
+          `;
+
+          quizContainer.appendChild(card);
+        });
+      }
+    }
+
+    function selectAnswer(qId, selectedLetter, correctLetter) {
+      if (userAnswers[qId]) return;
+
+      userAnswers[qId] = selectedLetter;
+
+      const isCorrect = (selectedLetter === correctLetter);
+      const selectedBtn = document.getElementById(`btn-${qId}-${selectedLetter}`);
+      const correctBtn = document.getElementById(`btn-${qId}-${correctLetter}`);
+      const expBox = document.getElementById(`exp-${qId}`);
+
+      const allBtns = document.querySelectorAll(`#q-card-${qId} .option-btn`);
+      allBtns.forEach(btn => btn.classList.add('disabled'));
+
+      if (isCorrect) {
+        selectedBtn.classList.add('correct');
+        playSound('correct');
+        triggerConfetti();
+      } else {
+        selectedBtn.classList.add('wrong');
+        correctBtn.classList.add('correct');
+        playSound('wrong');
+      }
+
+      if (expBox) {
+        expBox.style.display = 'block';
+      }
+
+      updateProgressBar();
+    }
+
+    function updateProgressBar() {
+      const answeredCount = Object.keys(userAnswers).length;
+      const totalCount = quizData.length;
+      const percentage = (answeredCount / totalCount) * 100;
+      document.getElementById('progress-bar').style.width = percentage + '%';
+    }
+
+    /* ==========================================
+       5. LOGIC CHẤM ĐIỂM & TỔNG KẾT
+       ========================================== */
+    function submitQuiz() {
+      let score = 0;
+      const total = quizData.length;
+
+      quizData.forEach(q => {
+        if (userAnswers[q.id] === q.correct) {
+          score++;
+        }
+      });
+
+      const percentage = (score / total) * 100;
+      let feedback = "";
+
+      if (percentage < 50) {
+        feedback = "Điểm lần này chưa cao lắm, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+      } else if (percentage <= 80) {
+        feedback = "Con đã có tiến bộ khá ổn rồi, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+      } else {
+        feedback = "Làm tốt lắm, con cố gắng ring điểm 10 ở lần sau nha!";
+        triggerConfetti();
+      }
+
+      document.getElementById('modal-score-text').innerText = `${score} / ${total}`;
+      document.getElementById('modal-feedback-text').innerText = feedback;
+      document.getElementById('result-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('result-modal').style.display = 'none';
+    }
+
+    window.onload = function() {
+      renderQuiz();
+    };
+  </script>
+</body>
+</html>
